@@ -127,9 +127,9 @@ data EqPair where
 
 {- FIVE -}
 
--- | Perhaps a slightly less intuitive feature of GADTs is that we can set
--- phantom type parameters (in this case @a@) to different things depending on
--- the constructor.
+-- | Perhaps a slightly less intuitive feature of GADTs is that we can set our
+-- type parameters (in this case @a@) to different types depending on the
+-- constructor.
 
 data MysteryBox a where
   EmptyBox  ::                                MysteryBox ()
@@ -165,7 +165,7 @@ countLayers = error "Implement me"
 
 {- SIX -}
 
--- | We can even use phantom types to keep track of the types inside an
+-- | We can even use our type parameters to keep track of the types inside an
 -- 'HList'!  For example, this heterogeneous list contains no existentials:
 
 data HList a where
@@ -252,8 +252,8 @@ foldValues = error "Implement me, three!"
 {- NINE -}
 
 -- | Here's the "classic" example of a GADT, in which we build a simple
--- expression language. Note that we use the phantom type to make sure that our
--- expression is well-formed.
+-- expression language. Note that we use the type parameter to make sure that
+-- our expression is well-formed.
 
 data Expr a where
   Equals :: Expr Int  -> Expr Int              -> Expr Bool
