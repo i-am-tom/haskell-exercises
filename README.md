@@ -27,3 +27,12 @@ concepts will turn up throughout as we dig deeper into the extensions.
 > being written by [Sandy Maguire](https://github.com/isovector). It is a
 > **fantastic** resource, and one on which I already rely when explaining
 > concepts to others.
+
+## Contents
+
+1. `GADTs`
+2. `FlexibleInstances`
+3. `KindSignatures`
+4. `DataKinds`
+5. `RankNTypes`
+6. `TypeFamilies`
