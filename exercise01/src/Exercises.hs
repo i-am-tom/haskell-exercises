@@ -156,8 +156,8 @@ countLayers :: MysteryBox a -> Int
 countLayers = error "Implement me"
 
 -- | c. Try to implement a function that removes one layer of "Box". For
--- example, this should turn a BoolBox into a StringBox, and so on. Why can't
--- we write it? What would its type be?
+-- example, this should turn a BoolBox into a StringBox, and so on. What gets
+-- in our way? What would its type be?
 
 
 
