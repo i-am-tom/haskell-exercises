@@ -256,10 +256,11 @@ foldValues = error "Implement me, three!"
 -- our expression is well-formed.
 
 data Expr a where
-  Equals :: Expr Int  -> Expr Int              -> Expr Bool
-  Add    :: Expr Int  -> Expr Int              -> Expr Int
-  If     :: Expr Bool -> Expr a   -> Expr a    -> Expr a
-  Value  :: Int                                -> Expr Int
+  Equals    :: Expr Int  -> Expr Int            -> Expr Bool
+  Add       :: Expr Int  -> Expr Int            -> Expr Int
+  If        :: Expr Bool -> Expr a   -> Expr a  -> Expr a
+  IntValue  :: Int                              -> Expr Int
+  BoolValue :: Bool                             -> Expr Bool
 
 -- | a. Implement the following function and marvel at the typechecker:
 
@@ -271,10 +272,11 @@ eval = error "Implement me"
 -- polymorphism) we have to fix the return type. Why do you think this is?
 
 data DirtyExpr
-  = DirtyEquals DirtyExpr DirtyExpr
-  | DirtyAdd    DirtyExpr DirtyExpr
-  | DirtyIf     DirtyExpr DirtyExpr DirtyExpr
-  | DirtyValue  Int
+  = DirtyEquals    DirtyExpr DirtyExpr
+  | DirtyAdd       DirtyExpr DirtyExpr
+  | DirtyIf        DirtyExpr DirtyExpr DirtyExpr
+  | DirtyIntValue  Int
+  | DirtyBoolValue Bool
 
 parse :: DirtyExpr -> Maybe (Expr Int)
 parse = error "Implement me"
