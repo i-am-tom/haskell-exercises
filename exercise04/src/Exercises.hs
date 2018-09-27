@@ -56,7 +56,7 @@ data Void -- No constructors!
 
 data Nat = Z | S Nat
 
-data StringAndIntList (stringCount :: Bool) where
+data StringAndIntList (stringCount :: Nat) where
   -- ...
 
 -- | b. Update it to keep track of the count of strings /and/ integers.
