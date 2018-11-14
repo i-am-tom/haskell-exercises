@@ -36,3 +36,4 @@ concepts will turn up throughout as we dig deeper into the extensions.
 4. `DataKinds`
 5. `RankNTypes`
 6. `TypeFamilies`
+7. `ConstraintKinds`

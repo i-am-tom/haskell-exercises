@@ -134,7 +134,7 @@ type family CAppend (x :: Constraint) (y :: Constraint) :: Constraint where
 -- | a. Write a family that takes a constraint constructor, and a type-level
 -- list of types, and builds a constraint on all the types.
 
-type family Every (c :: Type -> Constraint) (x :: Type) :: Constraint where
+type family Every (c :: Type -> Constraint) (x :: [Type]) :: Constraint where
   -- ...
 
 -- | b. Write a 'Show' instance for 'HList' that requires a 'Show' instance for
