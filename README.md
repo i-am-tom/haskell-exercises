@@ -9,9 +9,6 @@ through extensions one at a time, and build up a richer vocabulary for talking
 about Haskell programs, and look to move our assertions up into types, where
 they can be verified at compile time.
 
-I can't make any guarantees as to how quickly this repository will fill up, but
-I'm looking to publish at least a section per week.
-
 ---
 
 ## What this _isn't_.
