@@ -200,3 +200,7 @@ data Communication (label :: Label) where
 
 -- serverLog :: [Sigma Communication] -> [ServerData]
 -- serverLog = error "YOU CAN DO IT"
+
+-- | d. Arguably, in this case, the Sigma type is overkill; what could we have
+-- done, perhaps using methods from previous chapters, to "hide" the label
+-- until we pattern-matched?
