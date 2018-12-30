@@ -35,6 +35,7 @@ concepts will turn up throughout as we dig deeper into the extensions.
 6. `TypeFamilies`
 7. `ConstraintKinds`
 8. `PolyKinds`
+9. `MultiParamTypeClasses`
 
 ## Setup
 
