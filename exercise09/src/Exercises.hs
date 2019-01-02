@@ -299,7 +299,7 @@ instance Coat a Cold where doINeedACoat _ _ = True
 -- decision is made: you /should/ wear a coat on such a day. Thus, the
 -- __second__ rule is a higher priority.
 
--- | a. Comment out the above, and add OVERLAPPING and/or OVERLAPPABLE pragmas
+-- | a. Uncomment the above, and add OVERLAPPING and/or OVERLAPPABLE pragmas
 -- to prioritise the second rule. Why didn't that work? Which step of the
 -- instance resolution process is causing the failure?
 
