@@ -72,8 +72,7 @@ flatMap = error "Implement me!"
 
 {- FOUR -}
 
--- | a. Nat fun! Write a type-level '<=' function using the promoted 'Ordering'
--- type.
+-- | a. Nat fun! Write a type-level '<=' function
 
 -- | b. Write a 'Max' family to get the maximum of two natural numbers.
 
