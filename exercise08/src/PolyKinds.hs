@@ -90,8 +90,11 @@ type family Smuggler (x :: k) :: k where
   Smuggler a                 =    a
 
 {-
-  Huh. It seems that, while we said this function would work for /any/ kind,
-  Now, notice you can't do this at the value level:
+  Huh. It seems that, while we said this function would work for /any/ kind, we
+  actually can inspect the kind in our rules. As a result, type families aren't
+  necessarily __parametric__: seeing `type family Id (x :: k) :: k` doesn't
+  tell you as much about its implementation as `id :: a -> a` does for a value-
+  level function:
 -}
 
 smuggle :: a -> a
@@ -100,9 +103,11 @@ smuggle a                       = a
 
 {-
   Once you enable the extensions as GHC tells you, the error is that we
-  couldn't match  @IO (Secrets, a)@ with @a@. This is because we said this
-  function will work /for all/ a, and we therefore can't know anything about
-  the value!
+  couldn't match  @IO (Secrets, a)@ with @a@. Because we said this function
+  will work /for all/ a, we therefore can't know anything about the value! With
+  type families, however, we can look at the intuitively kinds involved as more
+  arguments to the function. The 'Smuggler' family has two inputs: the /type/
+  @x@, and the /kind/ @k@.
 
   This extra power with kind polymorphism makes for some exciting opportunities
   to abuse the type system, as we'll see in the exercises.
