@@ -144,7 +144,7 @@ data Strings (n :: Nat) where
 --   example
 --     = [ Sigma         SZ   SNil
 --       , Sigma     (SS SZ)  ("hi" :> SNil)
---       , Sigma (SS (SS SZ)) ("hello" :> "world")
+--       , Sigma (SS (SS SZ)) ("hello" :> ("world" :> SNil))
 --       ]
 -- @
 
@@ -166,7 +166,14 @@ data Vector (a :: Type) (n :: Nat) where -- @n@ and @a@ flipped... Hmm, a clue!
   VNil  ::                    Vector a  'Z
   VCons :: a -> Vector a n -> Vector a ('S n)
 
--- | d. Our sigma type is actually very useful. Let's imagine we're looking at
+
+
+
+
+
+{- SIX -}
+
+-- | Our sigma type is actually very useful. Let's imagine we're looking at
 -- a communication protocol over some network, and we label our packets as
 -- @Client@ or @Server@:
 
