@@ -105,7 +105,7 @@ smuggle a                       = a
   Once you enable the extensions as GHC tells you, the error is that we
   couldn't match  @IO (Secrets, a)@ with @a@. Because we said this function
   will work /for all/ a, we therefore can't know anything about the value! With
-  type families, however, we can look at the intuitively kinds involved as more
+  type families, however, we can look at the kinds involved as more
   arguments to the function. The 'Smuggler' family has two inputs: the /type/
   @x@, and the /kind/ @k@.
 
