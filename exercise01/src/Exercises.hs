@@ -58,8 +58,8 @@ reverseAnyList = undefined
 filterAnyList :: (a -> Bool) -> AnyList -> AnyList
 filterAnyList = undefined
 
-countAnyList :: AnyList -> Int
-countAnyList = undefined
+lengthAnyList :: AnyList -> Int
+lengthAnyList = undefined
 
 foldAnyList :: Monoid m => AnyList -> m
 foldAnyList = undefined
