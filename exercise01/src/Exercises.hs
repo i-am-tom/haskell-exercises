@@ -437,11 +437,12 @@ tidy (DirtyBoolValue x) = Just (BoolType (BoolValue x))
 
 parse :: DirtyExpr -> Maybe (Expr Int)
 parse xs = case tidy xs of
-    Just (IntType x) -> Just x
-    Nothing          -> Nothing
+  Just (IntType x) -> Just x
+  Nothing          -> Nothing
 
 -- | c. Can we add functions to our 'Expr' language? If not, why not? What
--- other constructs would we need to add? Could we still avoid 'Maybe'?
+-- other constructs would we need to add? Could we still avoid 'Maybe' in the
+-- 'eval' function?
 
 -- We can steal functions from Haskell to achieve this sort of thing. When we
 -- do so, it's called a Higher-Order Abstract Syntax (or HOAS for short). This
@@ -478,9 +479,5 @@ data TypeAlignedList a b where
 -- not as difficult as you'd initially think.
 
 composeTALs :: TypeAlignedList b c -> TypeAlignedList a b -> TypeAlignedList a c
-composeTALs xs ys = TypeAlignedCons (toFunction ys) xs
-  where
-    toFunction :: TypeAlignedList a b -> (a -> b)
-    toFunction  TypeAlignedNil        = id
-    toFunction (TypeAlignedCons f fs) = toFunction fs . f
-
+composeTALs xs  TypeAlignedNil        = xs
+composeTALs xs (TypeAlignedCons y ys) = TypeAlignedCons y (composeTALs xs ys)
