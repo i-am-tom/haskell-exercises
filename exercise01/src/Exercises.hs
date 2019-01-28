@@ -284,7 +284,8 @@ parse :: DirtyExpr -> Maybe (Expr Int)
 parse = error "Implement me"
 
 -- | c. Can we add functions to our 'Expr' language? If not, why not? What
--- other constructs would we need to add? Could we still avoid 'Maybe'?
+-- other constructs would we need to add? Could we still avoid 'Maybe' in the
+-- 'eval' function?
 
 
 
