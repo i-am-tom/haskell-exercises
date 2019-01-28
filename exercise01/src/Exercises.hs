@@ -211,8 +211,10 @@ data HTree a where
 -- try breaking the implementation - does it type-check? If not, why not?
 
 -- | c. Implement 'Eq' for 'HTree's. Note that you might have to write more
--- than one to cover all possible HTrees. Recursion is your friend here - you
--- shouldn't need to add a constraint to the GADT!
+-- than one to cover all possible HTrees. You might also need an extension or
+-- two, so look out for something... flexible... in the error messages!
+-- Recursion is your friend here - you shouldn't need to add a constraint to
+-- the GADT!
 
 
 
