@@ -473,7 +473,16 @@ data TypeAlignedList a b where
 
 -- | b. Which types are existential?
 
--- All of them except the first and last!
+-- (a -> b) and TypeAlignedList b c. Beware: the a & b in the data type are not 
+-- the same a & b in the type signature of the constructors. 
+-- This becomes apparent when asking GHC:
+-- 
+-- ƛ: :i TypeAlignedList
+-- type role TypeAlignedList nominal nomin
+-- data TypeAlignedList a b where
+--  TypeAlignedNil :: TypeAlignedList a a
+--  TypeAlignedCons :: (a -> b1) -> (TypeAlignedList b1 b)
+--                     -> TypeAlignedList a b
 
 -- | c. Write a function to append type-aligned lists. This is almost certainly
 -- not as difficult as you'd initially think.
