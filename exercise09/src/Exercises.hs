@@ -110,18 +110,19 @@ data SNat (n :: Nat) where
   SZ ::           SNat  'Z
   SS :: SNat n -> SNat ('S n)
 
--- | In the @DataKinds@ chapter, we wrote the 'SmallerThan' data type:
+-- | In the @DataKinds@ chapter, we wrote the 'SmallerThan' data type, which
+-- we'll call 'Fin' from now on:
 
-data SmallerThan (limit :: Nat) where
-  SmallerThanZ ::                  SmallerThan ('S n)
-  SmallerThanS :: SmallerThan n -> SmallerThan ('S n)
+data Fin (limit :: Nat) where
+  FZ ::          Fin ('S n)
+  FS :: Fin n -> Fin ('S n)
 
--- | We can write a class to take an 'SNat' to a 'SmallerThan' using
+-- | We can write a class to take an 'SNat' to a 'Fin' using
 -- @MultiParamTypeClasses@. We can even use @TypeOperators@ to give our class a
 -- more intuitive name:
 
 class (x :: Nat) < (y :: Nat) where
-  convert :: SNat x -> SmallerThan y
+  convert :: SNat x -> Fin y
 
 -- | a. Write the instance that says @Z@ is smaller than @S n@ for /any/ @n@.
 
@@ -149,8 +150,8 @@ class (x :: Nat) < (y :: Nat) where
 -- and vice versa. We don't have the same luxury with /our/ class, however –
 -- because we can't convince the compiler that only one instance will ever
 -- exist, it can't assume that we want the instance we've just written. No
--- matter, though - we can just add two functions to our class to convert
--- between the types. Write them, and don't overthink!
+-- matter, though - we can just add two functions (@x -> y@ and @y -> x@) to
+-- our class to convert between the types. Write them, and don't overthink!
 
 -- | d. GHC can see @x ~ y@ and @y ~ z@, then deduce that @x ~ z@. Can we do
 -- the same? Perhaps with a second instance? Which pragma(s) do we need and
@@ -168,27 +169,18 @@ data HList (xs :: [Type]) where
   -- In fact, you know what? You can definitely write an HList by now – I'll
   -- just put my feet up and wait here until you're done!
 
--- | We know we can use type families to append type-level lists...
+-- | Consider the following class for taking the given number of elements from
+-- the front of an HList:
 
-type family (ls :: [k]) ++ (ys :: [k]) :: [k] where -- Oo, @PolyKinds@!
-  '[     ]  ++ ys =             ys
-  (x ': xs) ++ ys = x ': (xs ++ ys)
-
--- | Notice that we pattern-match on the first argument, but don't even need
--- to look into the second one. A CLUE, HOLMES.
-
--- | Consider the following class:
-
-class Appendable (ls :: [Type]) (rs :: [Type]) where
-  append :: HList ls -> HList rs -> HList (ls ++ rs)
+class HTake (n :: Nat) (xs :: [Type]) (ys :: [Type]) where
+  htake :: SNat n -> HList xs -> HList ys
 
 -- | a. Write an instance for an empty left-hand HList.
 
 -- | b. Write an instance for a non-empty left-hand list. You "may" need a
 -- constraint on this instance.
 
--- | c. What does this tell us about the functionality that type classes can
--- "add" to type families?
+-- | c. What case have we forgotten? How might we handle it?
 
 
 
@@ -355,7 +347,7 @@ newtype CommentId = CommentId Int
 data Comment
   = Comment
       { id     :: CommentId
-      , author :: Int
+      , author :: UserId
       , text   :: String
       }
 
@@ -372,10 +364,8 @@ class CommentCache where
   storeComment :: Comment -> Map CommentId Comment -> Map CommentId Comment
   loadComment  :: Map CommentId Comment -> CommentId -> Maybe Comment
 
--- | "This is silly", you exclaim in a supportive and non-hostile way. "These
--- classes only differ in three ways! We could write this as a multi-parameter
--- type class!", you suggest in a way that encourages my continued progression
--- as an engineer and team player.
+-- | "This is silly", you exclaim. "These classes only differ in three ways! We
+-- could write this as a multi-parameter type class!"
 
 -- | a. What are those three ways? Could we turn them into parameters to a
 -- typeclass? Do it!

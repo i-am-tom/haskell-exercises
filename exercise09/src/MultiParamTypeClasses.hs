@@ -199,6 +199,7 @@ instance Sneaky Float Float where
   out the second type:
 -}
 
+-- -- UNCOMMENT ME
 -- huh = familiar (3.0 :: Float)
 
 {-
@@ -221,8 +222,8 @@ instance a ~ [Double] => Sneaky Double a where
 heh = familiar (3.0 :: Double)
 
 {-
-  This time, no complaints! Why? Because in the instance head (note: this
-  __does not include constraints__), we've said we have an instance for
+  This time, no complaints! Why? Because in the instance head (the bit on the
+  right-hand side of the @=>@ arrow), we've said we have an instance for
   @Double@ and /any/ second parameter you like. After we've successfully chosen
   that instance, the constraints /then/ tell us that the second type /must/ be
   @Double@, and we'll get an error if it isn't. This separation between
@@ -234,8 +235,9 @@ heh = familiar (3.0 :: Double)
   only want to use this instance __if all others fail__. Sound familiar?
 -}
 
-instance {-# INCOHERENT #-} a ~ b => Sneaky a b where
-  familiar = id
+-- -- UNCOMMENT ME
+-- instance {-# INCOHERENT #-} a ~ b => Sneaky a b where
+--   familiar = id
 
 {-
   Here's a scary-looking line of code, right? What we're saying here is, if you
@@ -247,14 +249,14 @@ instance {-# INCOHERENT #-} a ~ b => Sneaky a b where
   Now, this all sounds sensible, so... why the scary name? Friends, we have
   some misconceptions to address:
 
-  1. Most "incoherence" around type classes comes from what we call /orphan
+  1. _Most_ "incoherence" around type classes comes from what we call /orphan
      instances/. These are instances defined for types that exist neither in
      the same module as the type declaration /nor/ the class declaration. If
      we avoid orphan instances (by, for example, creating @newtype@s when we
      want different behaviours instead of overlapping existing instances),
      there is no incoherence with @OVERLAPPING@, @OVERLAPS@, or @OVERLAPPABLE@,
      thus they are simply safe – and extremely useful – tools for us to use.
-  
+
   2. @INCOHERENT@ instances only become incoherent when GHC is given a choice
      between more than one of them. If you only ever have one defined - or find
      a clever way to avoid ever matching more than one* - then this is a very
