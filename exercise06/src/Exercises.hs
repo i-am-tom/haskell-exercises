@@ -22,7 +22,7 @@ data Nat = Z | S Nat
 -- | a. Use the @TypeOperators@ extension to rewrite the 'Add' family with the
 -- name '+':
 
--- | b. Write a type family '*' that multiplies two naturals using '(+)'. Which
+-- | b. Write a type family '**' that multiplies two naturals using '(+)'. Which
 -- extension are you being told to enable? Why?
 
 data SNat (value :: Nat) where
