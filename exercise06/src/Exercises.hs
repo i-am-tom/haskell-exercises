@@ -1,6 +1,5 @@
 {-# LANGUAGE DataKinds            #-}
 {-# LANGUAGE GADTs                #-}
-{-# LANGUAGE PolyKinds            #-}
 {-# LANGUAGE TypeFamilies         #-}
 {-# LANGUAGE TypeOperators        #-}
 {-# LANGUAGE UndecidableInstances #-}
@@ -192,7 +191,7 @@ type family Biggest' (l :: Tree) (c :: Nat) (r' :: (Nat, Tree)) :: (Nat, Tree) w
 -- We can use this type to write "tests" for the above. Any mention of Refl
 -- will force GHC to try to unify the two type parameters. If it fails, we get
 -- a type error!
-data (x :: k) :~: (y :: k) where
+data (x :: Tree) :~: (y :: Tree) where
   Refl :: x :~: x
 
 deleteTest0 :: Delete 'Z 'Empty :~: 'Empty
@@ -224,7 +223,7 @@ data HList (xs :: [Type]) where
 
 -- | Write a function that appends two 'HList's.
 
-type family (xs :: [k]) ++ (ys :: [k]) :: [k] where
+type family (xs :: [Type]) ++ (ys :: [Type]) :: [Type] where
   '[     ]  ++ ys =             ys
   (x ': xs) ++ ys = x ': (xs ++ ys)
 
@@ -292,15 +291,19 @@ instance (Every Eq xs, Every Ord xs) => Ord (HList xs) where
 -- input natural.
 
 -- Let's worry about performance another day...
+type family (x :: [Nat]) +++ (y :: [Nat]) :: [Nat] where
+  '[] +++ ys = ys
+  (x ': xs) +++ ys = x ': (xs +++ ys)
+
 type family UpTo (x :: Nat) :: [Nat] where
   UpTo  'Z    = '[ 'Z ]
-  UpTo ('S n) = UpTo n ++ '[ 'S n ]
+  UpTo ('S n) = UpTo n +++ '[ 'S n ]
 
 -- | b. Write a type-level prime number sieve.
 type family Sieve (x :: Nat) :: [Nat] where
   Sieve x = Sieve' (Drop ('S ('S 'Z)) (UpTo x))
 
-type family Drop (n :: Nat) (xs :: [k]) :: [k] where
+type family Drop (n :: Nat) (xs :: [Nat]) :: [Nat] where
   Drop  'Z     xs       = xs
   Drop   _    '[     ]  = '[]
   Drop ('S n) (x ': xs) = Drop n xs
@@ -309,10 +312,10 @@ type family Sieve' (xs :: [Nat]) :: [Nat] where
   Sieve' '[     ]  = '[]
   Sieve' (x ': xs) = x ': Sieve' (DropEvery x xs)
 
-type family DropEvery (n :: Nat) (xs :: [k]) :: [k] where
+type family DropEvery (n :: Nat) (xs :: [Nat]) :: [Nat] where
   DropEvery n xs = DropEvery' n n xs
 
-type family DropEvery' (c :: Nat) (n :: Nat) (xs :: [k]) :: [k] where
+type family DropEvery' (c :: Nat) (n :: Nat) (xs :: [Nat]) :: [Nat] where
   DropEvery n ('S 'Z) (x ': xs) = DropEvery' n n xs
   DropEvery n   _     '[     ]  = '[]
   DropEvery n ('S c)  (x ': xs) = x ': DropEvery' n c xs
@@ -330,8 +333,11 @@ type N9  = 'S N8
 type N10 = 'S N9
 
 -- Little test...
-test :: Sieve N10 :~: '[ N2, N3, N5, N7 ]
-test = Refl
+data (x :: [Nat]) :~~: (y :: [Nat]) where
+  NRefl :: x :~~: x
+
+test :: Sieve N10 :~~: '[ N2, N3, N5, N7 ]
+test = NRefl
 
 
 -- | c. Why is this such hard work?
