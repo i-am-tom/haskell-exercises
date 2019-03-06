@@ -3,9 +3,11 @@
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE GADTs #-}
 {-# LANGUAGE KindSignatures #-}
+{-# LANGUAGE PolyKinds #-}
 {-# LANGUAGE RankNTypes #-}
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE TypeOperators #-}
+{-# LANGUAGE UndecidableInstances #-}
 module Exercises where -- ^ This is starting to look impressive, right?
 
 import Data.Kind (Constraint, Type)
@@ -34,13 +36,21 @@ data List a = Nil | Cons a (List a)
 -- constraints can the @Nil@ case satisfy?
 
 data ConstrainedList (c :: Type -> Constraint) where
-  -- IMPLEMENT ME
+  CNil :: ConstrainedList c
+  CCons :: c x => x -> ConstrainedList c -> ConstrainedList c
 
 -- | b. Using what we know about RankNTypes, write a function to fold a
 -- constrained list. Note that we'll need a folding function that works /for
 -- all/ types who implement some constraint @c@. Wink wink, nudge nudge.
 
--- foldConstrainedList :: ???
+foldConstrainedList
+  :: Monoid m
+  => (forall x. c x => x -> m)
+  -> ConstrainedList c
+  -> m
+
+foldConstrainedList f  CNil        = mempty
+foldConstrainedList f (CCons x xs) = f x <> foldConstrainedList f xs
 
 -- | Often, I'll want to constrain a list by /multiple/ things. The problem is
 -- that I can't directly write multiple constraints into my type, because the
@@ -54,11 +64,19 @@ data ConstrainedList (c :: Type -> Constraint) where
 -- combines `Monoid a` and `Show a`. What other extension did you need to
 -- enable? Why?
 
--- class ??? => Constraints a
--- instance ??? => Constraints a
+-- UndecidableInstances is required because nothing is getting "smaller" - when
+-- GHC encounters this constraint, it ends up with more things to solve! This
+-- means that GHC's (limited) termination checker can't be convinced that we'll
+-- ever terminate.
+class (Monoid a, Show a) => Constraints a
+instance (Monoid a, Show a) => Constraints a
 
 -- | What can we now do with this constrained list that we couldn't before?
 -- There are two opportunities that should stand out!
+
+-- We can show everything in it, and we can fill it with 'mempty'. We can't
+-- write a monoid instance, because we have no way of telling that two
+-- constrained lists contain the /same/ monoids. :(
 
 
 
@@ -81,11 +99,33 @@ data HList (xs :: [Type]) where
 -- | a. Write this fold function. I won't give any hints to the definition, but
 -- we will probably need to call it like this:
 
--- test :: ??? => HList xs -> String
--- test = fold (TCProxy :: TCProxy Show) show
+type family Every (c :: Type -> Constraint) (xs :: [Type]) :: Constraint where
+  Every c '[] = ()
+  Every c (x ': xs) = (c x, Every c xs)
+
+data TCProxy (c :: Type -> Constraint)
+  = TCProxy
+
+fold
+  :: (Every c xs, Monoid m)
+  => TCProxy c
+  -> (forall x. c x => x -> m)
+  -> HList xs
+  -> m
+
+fold _ f  HNil        = mempty
+fold p f (HCons x xs) = f x <> fold p f xs
+
+test :: Every Show xs => HList xs -> String
+test = fold (TCProxy :: TCProxy Show) show
 
 -- | b. Why do we need the proxy to point out which constraint we're working
 -- with?  What does GHC not like if we remove it?
+
+-- The type is ambiguous! We've no way of telling it what the constraint /is/.
+-- Even if we give it a function like 'show', GHC's not going to /guess/ that
+-- we care about the 'Show' constraint, when the empty constraint would also
+-- fit the gap!
 
 -- | We typically define foldMap like this:
 
@@ -101,3 +141,7 @@ f :: a ~ b => a -> b
 f = id
 
 -- | Write @foldMap@ for @HList@!
+
+foldMapH :: (Monoid m, Every ((~) a) xs) => (a -> m) -> HList xs -> m
+foldMapH f  HNil        = mempty
+foldMapH f (HCons x xs) = f x <> foldMapH f xs
