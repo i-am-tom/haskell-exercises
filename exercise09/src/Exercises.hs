@@ -373,7 +373,8 @@ class CommentCache where
 
 -- | b. Write instances for 'User' and 'Comment', and feel free to implement
 -- them as 'undefined' or 'error'. Now, before uncommenting the following, can
--- you see what will go wrong?
+-- you see what will go wrong? (If you don't see an error, try to call it in
+-- GHCi...)
 
 -- oops cache = load cache (UserId (123 :: Int))
 
