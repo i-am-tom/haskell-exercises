@@ -156,7 +156,7 @@ class (x :: Nat) < (y :: Nat) where
 
 -- | d. GHC can see @x ~ y@ and @y ~ z@, then deduce that @x ~ z@. Can we do
 -- the same? Perhaps with a second instance? Which pragma(s) do we need and
--- why?
+-- why? Can we even solve this?
 
 
 
