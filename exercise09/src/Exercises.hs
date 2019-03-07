@@ -176,9 +176,9 @@ data HList (xs :: [Type]) where
 class HTake (n :: Nat) (xs :: [Type]) (ys :: [Type]) where
   htake :: SNat n -> HList xs -> HList ys
 
--- | a. Write an instance for an empty left-hand HList.
+-- | a. Write an instance for taking 0 elements.
 
--- | b. Write an instance for a non-empty left-hand list. You "may" need a
+-- | b. Write an instance for taking a non-zero number. You "may" need a
 -- constraint on this instance.
 
 -- | c. What case have we forgotten? How might we handle it?
