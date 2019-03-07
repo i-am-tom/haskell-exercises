@@ -87,7 +87,8 @@ instance Traversable Identity where
 -- | b. Write a 'Wanderable' instance for 'Identity'.
 
 -- | c. Write 'Wanderable' instances for 'Maybe', '[]', and 'Proxy', noting the
--- differing constraints required on the @f@ type.
+-- differing constraints required on the @f@ type. '[]' might not work so well,
+-- and we'll look at /why/ in the next part of this question!
 
 -- | d. Assuming you turned on the extension suggested by GHC, why does the
 -- following produce an error? Using only the extensions we've seen so far, how
