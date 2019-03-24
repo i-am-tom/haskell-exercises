@@ -67,7 +67,7 @@ data Nat = Z | S Nat
 -- two type-level naturals together. If we do a side-by-side comparison of the
 -- equivalent "class-based" approach:
 
-class       Add  (x :: Nat) (y :: Nat) (z :: Nat) | x y -> z, z x -> y
+class       Add  (x :: Nat) (y :: Nat) (z :: Nat) | x y -> z
 type family Add' (x :: Nat) (y :: Nat)    :: Nat
 
 -- | We see here that there are parallels between classes and type families.
@@ -76,7 +76,7 @@ type family Add' (x :: Nat) (y :: Nat)    :: Nat
 -- the result of a type family is determined by its inputs - something we can
 -- express as a functional dependency!
 
--- | a. Write the two requiredi nstances for the 'Add' class by
+-- | a. Write the two required instances for the 'Add' class by
 -- pattern-matching on the first argument. Remember that instances can have
 -- constraints, and this is how we do recursion!
 
@@ -100,7 +100,7 @@ data Proxy (a :: k) = Proxy
 -- because the names of types are far too confusing. To that end, we can give
 -- our types friendlier names to make the coding experience less intimidating:
 
-class (x :: k) `IsNamed` (label :: Symbol) | x -> label, label -> x where
+class (x :: k) `IsNamed` (label :: Symbol) where
   fromName :: Proxy x     -> Proxy label
   fromName _ = Proxy
 
@@ -241,17 +241,8 @@ instance GNameOf (Rep x) name => NameOf x name
 class GNameOf (rep :: Type -> Type) (name :: Symbol) | rep -> name
 instance GNameOf (G.D1 ('G.MetaData name a b c) d) name
 
--- | a. Read the docs for 'GHC.TypeLits.symbolVal', and write a function that
--- takes any generic-implementing type and returns its name as a value-level
--- 'String'. For example: @getName True === "Bool"@.
-
--- | b. Write a function to get the names of the constructors of a type as a
+-- | Write a function to get the names of the constructors of a type as a
 -- type-level list of symbols.
-
--- | c. Write a function that returns the names of constructors as value-level
--- strings. Note that you might need to check that /all/ members of a
--- type-level list implement some constraint... you might need some sort of...
--- type-level function...
 
 
 
