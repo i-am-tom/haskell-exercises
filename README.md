@@ -27,15 +27,16 @@ concepts will turn up throughout as we dig deeper into the extensions.
 
 ## Contents
 
-1. `GADTs`
-2. `FlexibleInstances`
-3. `KindSignatures`
-4. `DataKinds`
-5. `RankNTypes`
-6. `TypeFamilies`
-7. `ConstraintKinds`
-8. `PolyKinds`
-9. `MultiParamTypeClasses`
+1.  `GADTs`
+2.  `FlexibleInstances`
+3.  `KindSignatures`
+4.  `DataKinds`
+5.  `RankNTypes`
+6.  `TypeFamilies`
+7.  `ConstraintKinds`
+8.  `PolyKinds`
+9.  `MultiParamTypeClasses`
+10. `FunctionalDependencies`
 
 ## Setup
 
