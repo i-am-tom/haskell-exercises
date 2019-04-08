@@ -50,7 +50,7 @@ filterInts = error "Contemplate me!"
 data AnyList where
   -- ...
 
--- | b. How many of the following functions can we implement for an 'AnyList'?
+-- | b. How many of the following functions can we implement for an 'AnyList' without using ConstraintKinds?
 
 reverseAnyList :: AnyList -> AnyList
 reverseAnyList = undefined
