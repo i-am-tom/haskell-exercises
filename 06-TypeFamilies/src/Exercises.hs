@@ -145,11 +145,11 @@ data Tree = Empty | Node Tree Nat Tree
 
 -- | Write a type family to insert a promoted 'Nat' into a promoted 'Tree'.
 
-type family Insert (x :: Nat) (xs :: Tree) where
+type family Insert (x :: Nat) (xs :: Tree) :: Tree where
   Insert x  'Empty       = 'Node 'Empty x 'Empty
   Insert x ('Node l c r) = Insert' (Compare x c) x ('Node l c r)
 
-type family Insert' (o :: Ordering) (x :: Nat) (xs :: Tree) where
+type family Insert' (o :: Ordering) (x :: Nat) (xs :: Tree) :: Tree where
   Insert' 'LT x ('Node l c r) = 'Node (Insert x l) c r
   Insert' 'GT x ('Node l c r) = 'Node l c (Insert x r)
   Insert' 'EQ x  xs           =  xs
@@ -162,13 +162,13 @@ type family Insert' (o :: Ordering) (x :: Nat) (xs :: Tree) where
 -- | Write a type family to /delete/ a promoted 'Nat' from a promoted 'Tree'.
 
 -- SUPER UGLY.
-type family Delete (x :: Nat) (xs :: Tree) where
+type family Delete (x :: Nat) (xs :: Tree) :: Tree where
   Delete x  'Empty       = 'Empty
   Delete x ('Node l c r) = Delete' (Compare x c) x ('Node l c r)
 
 -- We can't let-bind the result of a function like 'Compare', so we have to
 -- have a helper family to compute the above.
-type family Delete' (o :: Ordering) (x :: Nat) (xs :: Tree) where
+type family Delete' (o :: Ordering) (x :: Nat) (xs :: Tree) :: Tree where
   Delete' 'LT x ('Node  l     c r) = 'Node (Delete x l) c r
   Delete' 'GT x ('Node  l     c r) = 'Node l c (Delete x r)
   Delete' 'EQ x ('Node 'Empty c r) = r
@@ -176,7 +176,7 @@ type family Delete' (o :: Ordering) (x :: Nat) (xs :: Tree) where
 
 -- ... We also can't have a helper family for the last case above, so we need
 -- two more helper families:
-type family Repair (parts :: (Nat, Tree)) (xs :: Tree) where
+type family Repair (parts :: (Nat, Tree)) (xs :: Tree) :: Tree where
   Repair '(c, l) r = 'Node l c r
 
 type family Biggest (xs :: Tree) :: (Nat, Tree) where
