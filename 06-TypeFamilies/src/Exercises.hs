@@ -268,7 +268,7 @@ instance Every Show xs => Show (HList xs) where
 -- Was this expected behaviour? Why did we need the constraints?
 
 instance Every Eq xs => Eq (HList xs) where
-  HCons x xs == HCons y ys = x == x && xs == ys
+  HCons x xs == HCons y ys = x == y && xs == ys
   _          == _          = True -- Could only be two HNils!
 
 -- We have to add 'Every Eq xs' here, which may seem odd, as 'Ord' has
