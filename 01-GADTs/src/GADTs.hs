@@ -105,7 +105,7 @@ example2 = show (ShowCons "Tom" (ShowCons 25 (ShowCons True ShowNil)))
 --              This is the "do you like dogs?" flag :) ^
 
 {-
-  This time, we get "\"Tom\" : 25 : True []". All our types are different, but
+  This time, we get "\"Tom\" : 25 : True : []". All our types are different, but
   they all have 'Show' instances, and that's enough to write a 'Show' instance
   for the whole list.
 
