@@ -20,8 +20,8 @@ compile-time. This is _not_ based around concepts; there won't be sections on
 concepts will turn up throughout as we dig deeper into the extensions.
 
 > If you're interested in something more project-based, I absolutely, 1000%
-> recommend [The Book of Types](https://www.patreon.com/isovector), currently
-> being written by [Sandy Maguire](https://github.com/isovector). It is a
+> recommend [Thinking with Types](https://leanpub.com/thinking-with-types), 
+> written by [Sandy Maguire](https://github.com/isovector). It is a
 > **fantastic** resource, and one on which I already rely when explaining
 > concepts to others.
 
