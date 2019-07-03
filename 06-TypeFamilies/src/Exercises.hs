@@ -95,8 +95,8 @@ type family (x :: Bool) && (y :: Bool) :: Bool where
 -- | b. Write the type-level @||@ function for booleans.
 
 type family (x :: Bool) || (y :: Bool) :: Bool where
-  'False || _ = 'False
-  'True  || y =  y
+  'False || y = y
+  'True  || _ = 'True
 
 -- | c. Write an 'All' function that returns @'True@ if all the values in a
 -- type-level list of boleans are @'True@.
