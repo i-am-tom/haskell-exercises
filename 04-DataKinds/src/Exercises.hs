@@ -1,9 +1,12 @@
-{-# LANGUAGE DataKinds      #-}
-{-# LANGUAGE GADTs          #-}
-{-# LANGUAGE KindSignatures #-}
+{-# LANGUAGE DataKinds         #-}
+{-# LANGUAGE GADTs             #-}
+{-# LANGUAGE KindSignatures    #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE ConstraintKinds   #-}
+
 module Exercises where
 
-import Data.Kind (Type)
+import Data.Kind (Type, Constraint)
 import Data.Function ((&))
 
 
@@ -21,10 +24,25 @@ data IntegerMonoid = Sum | Product
 -- | a. Write a newtype around 'Integer' that lets us choose which instance we
 -- want.
 
+newtype IntegerWith (method :: IntegerMonoid) = IntegerWith Integer
+
 -- | b. Write the two monoid instances for 'Integer'.
+
+instance Monoid (IntegerWith 'Sum) where
+  mempty = IntegerWith 0
+
+instance Monoid (IntegerWith 'Product) where
+  mempty = IntegerWith 1
+
+instance Semigroup (IntegerWith 'Sum) where
+  (IntegerWith int1) <> (IntegerWith int2) = IntegerWith (int1 + int2)
+
+instance Semigroup (IntegerWith 'Product) where
+  (IntegerWith int1) <> (IntegerWith int2) = IntegerWith (int1 * int2)
 
 -- | c. Why do we need @FlexibleInstances@ to do this?
 
+-- Monoid and Semigroup are not using generic types so we need flexible instances.
 
 
 
@@ -39,12 +57,16 @@ data Void -- No constructors!
 -- | a. If we promote this with DataKinds, can we produce any /types/ of kind
 -- 'Void'?
 
+-- No
+
 -- | b. What are the possible type-level values of kind 'Maybe Void'?
+
+-- Type ?
 
 -- | c. Considering 'Maybe Void', and similar examples of kinds such as
 -- 'Either Void Bool', why do you think 'Void' might be a useful kind?
 
-
+-- Because Void has no inhabitants it represents something that can never happen
 
 
 
@@ -56,15 +78,32 @@ data Void -- No constructors!
 
 data Nat = Z | S Nat
 
-data StringAndIntList (stringCount :: Nat) where
-  -- ...
+-- data StringAndIntList (stringCount :: Nat) where
+--   StringAndIntNil :: StringAndIntList 'Z
+--   StringList :: String -> StringAndIntList length -> StringAndIntList ('S length)
+--   IntList :: Int -> StringAndIntList length -> StringAndIntList length
 
 -- | b. Update it to keep track of the count of strings /and/ integers.
 
+data StringAndIntList (stringCount :: Nat) (intCount :: Nat) where
+  StringAndIntNil :: StringAndIntList 'Z 'Z
+  StringList :: String -> StringAndIntList sl il -> StringAndIntList ('S sl) (il)
+  IntList :: Int -> StringAndIntList sl il -> StringAndIntList sl ('S il)
+
+
 -- | c. What would be the type of the 'head' function?
 
+headString :: StringAndIntList ('S sl) il -> String
+headString (StringList str _)  = str
+
+headInt :: StringAndIntList sl ('S il) -> Int
+headInt (IntList intV _)  = intV
 
 
+head :: StringAndIntList sl il -> Maybe (Either String Int)
+head StringAndIntNil    = Nothing
+head (StringList str _) = Just $ Left str
+head (IntList intV _)   = Just $ Right intV
 
 
 {- FOUR -}
@@ -79,10 +118,14 @@ data Showable where
 -- stores this fact in the type-level.
 
 data MaybeShowable (isShowable :: Bool) where
-  -- ...
+  DefShowable :: Show a => a -> MaybeShowable 'True
+  NotShowable :: a -> MaybeShowable 'False
 
 -- | b. Write a 'Show' instance for 'MaybeShowable'. Your instance should not
 -- work unless the type is actually 'show'able.
+
+instance Show (MaybeShowable 'True) where
+  show (DefShowable aVal) = show aVal
 
 -- | c. What if we wanted to generalise this to @Constrainable@, such that it
 -- would work for any user-supplied constraint of kind 'Constraint'? How would
@@ -90,8 +133,8 @@ data MaybeShowable (isShowable :: Bool) where
 -- type - GHC should tell you exactly which extension you're missing.
 
 
-
-
+data Constrainable (c :: Type -> Constraint) where
+  Constrained :: c a => a -> Constrainable c
 
 {- FIVE -}
 

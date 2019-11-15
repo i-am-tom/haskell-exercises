@@ -9,4 +9,6 @@ library
   hs-source-dirs:   src
   exposed-modules:  GADTs
                   , Exercises
+  ghc-options:
+    -Wall
 
