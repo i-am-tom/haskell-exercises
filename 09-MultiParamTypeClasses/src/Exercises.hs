@@ -12,13 +12,16 @@
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE TypeOperators #-}
 {-# LANGUAGE UndecidableInstances #-}
+{-# LANGUAGE TypeApplications #-}
+{-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE ScopedTypeVariables #-}
 module Exercises where
 
 import Data.Kind (Constraint, Type)
 import Data.Map (Map)
 import Data.Proxy (Proxy (..))
 import GHC.TypeLits (TypeError, ErrorMessage (..))
-
+import Control.Applicative (liftA2)
 
 
 
@@ -37,14 +40,24 @@ newtype YourInt = YourInt Int
 
 -- | a. Write the class!
 
--- class Newtype ... ... where
---   wrap   :: ...
---   unwrap :: ...
+class Newtype a b where
+ wrap   :: a -> b
+ unwrap :: b -> a
 
 -- | b. Write instances for 'MyInt' and 'YourInt'.
 
+instance Newtype Int MyInt where
+  wrap             = MyInt
+  unwrap (MyInt n) = n
+
+instance Newtype Int YourInt where
+  wrap             = YourInt
+  unwrap (YourInt n) = n
+
 -- | c. Write a function that adds together two values of the same type,
 -- providing that the type is a newtype around some type with a 'Num' instance.
+addNewtype :: forall a b. (Num a, Newtype a b) => Proxy a -> b -> b -> b
+addNewtype _ b1 b2 = wrap @a $ unwrap b1 + unwrap b2
 
 -- | d. We actually don't need @MultiParamTypeClasses@ for this if we use
 -- @TypeFamilies@. Look at the section on associated type instances here:
@@ -52,6 +65,20 @@ newtype YourInt = YourInt Int
 -- rewrite the class using an associated type, @Old@, to indicate the
 -- "unwrapped" type. What are the signatures of 'wrap' and 'unwrap'?
 
+class Newtype' a where
+  type Old a :: Type
+  wrap' :: a -> Old a
+  unwrap' :: Old a -> a
+
+instance {-# OVERLAPPING #-} Newtype' Int where
+  type Old Int = MyInt
+  wrap'             = MyInt
+  unwrap' (MyInt a) = a
+
+--instance [># OVERLAPPABLE #<] Newtype' Int where
+  --type Old Int = YourInt
+  --wrap'             = YourInt
+  --unwrap' (YourInt a) = a
 
 
 
@@ -84,14 +111,30 @@ instance Traversable Identity where
 -- | a. Write that little dazzler! What error do we get from GHC? What
 -- extension does it suggest to fix this?
 
--- class Wanderable … … where
---   wander :: … => (a -> f b) -> t a -> f (t b)
+class Wanderable (c :: (Type -> Type) -> Constraint) (t :: Type -> Type) where
+ wander :: c f => (a -> f b) -> t a -> f (t b)
+
 
 -- | b. Write a 'Wanderable' instance for 'Identity'.
+
+instance Wanderable Functor Identity where
+  wander f (Identity x) = Identity <$> f x
 
 -- | c. Write 'Wanderable' instances for 'Maybe', '[]', and 'Proxy', noting the
 -- differing constraints required on the @f@ type. '[]' might not work so well,
 -- and we'll look at /why/ in the next part of this question!
+
+instance Wanderable Applicative Maybe where
+  wander f (Just a) = Just <$> f a
+  wander _ Nothing = pure Nothing
+
+instance Wanderable Applicative Proxy where
+  wander _ _ = pure Proxy
+
+-- GHC can decide which c1 use for the recursive wander.
+--instance Wanderable Applicative [] where
+  --wander f []       = pure []
+  --wander f (a : as) = liftA2 (:) (f a) (wander f as)
 
 -- | d. Assuming you turned on the extension suggested by GHC, why does the
 -- following produce an error? Using only the extensions we've seen so far, how
@@ -100,7 +143,15 @@ instance Traversable Identity where
 -- we'll see in later chapters that there are neater solutions to this
 -- problem!)
 
--- test = wander Just [1, 2, 3]
+class Wanderable' (c :: (Type -> Type) -> Constraint) (t :: Type -> Type) where
+ wander' :: c f => Proxy c -> (a -> f b) -> t a -> f (t b)
+
+instance Wanderable' Applicative [] where
+  wander' _ f []       = pure []
+  wander' p f (a : as) = liftA2 (:) (f a) (wander' p f as)
+
+-- UNCOMMENT
+--test = wander' (Proxy :: Proxy Applicative) Just [1, 2, 3]
 
 
 
@@ -172,7 +223,7 @@ class (x :: Nat) < (y :: Nat) where
 data HList (xs :: [Type]) where
   HNil :: HList '[]
   HCons :: x -> HList xs -> HList (x ': xs)
-  
+
 
 -- | Consider the following class for taking the given number of elements from
 -- the front of an HList:
