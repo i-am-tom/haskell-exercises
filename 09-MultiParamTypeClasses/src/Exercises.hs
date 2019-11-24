@@ -180,13 +180,22 @@ class (x :: Nat) < (y :: Nat) where
   convert :: SNat x -> Fin y
 
 -- | a. Write the instance that says @Z@ is smaller than @S n@ for /any/ @n@.
+instance 'Z < ('S n) where
+  convert SZ = FZ
 
 -- | b. Write an instance that says, if @x@ is smaller than @y@, then @S x@ is
 -- smaller than @S y@.
+instance (n < n') => ('S n) < ('S n') where
+  convert (SS n) = FS (convert n)
 
 -- | c. Write the inverse function for the class definition and its two
 -- instances.
-
+-- TODO: not sure what to do here.
+unconvert
+  :: x < y
+  => Fin y
+  -> SNat x
+unconvert = undefined
 
 
 
@@ -198,8 +207,12 @@ class (x :: Nat) < (y :: Nat) where
 -- instance.
 
 -- | a. Write that typeclass!
+--UNCOMMENT
+--class a ~~ b where
 
 -- | b. Write that instance!
+--UNCOMMENT
+--instance a ~~ a where
 
 -- | c. When GHC sees @x ~ y@, it can apply anything it knows about @x@ to @y@,
 -- and vice versa. We don't have the same luxury with /our/ class, however –
@@ -207,11 +220,22 @@ class (x :: Nat) < (y :: Nat) where
 -- exist, it can't assume that we want the instance we've just written. No
 -- matter, though - we can just add two functions (@x -> y@ and @y -> x@) to
 -- our class to convert between the types. Write them, and don't overthink!
+class a ~~ b where
+  to  :: b -> a
+  from :: a -> b
+
+instance {-# OVERLAPPABLE #-} a ~~ a where
+  to = Prelude.id
+  from = Prelude.id
 
 -- | d. GHC can see @x ~ y@ and @y ~ z@, then deduce that @x ~ z@. Can we do
 -- the same? Perhaps with a second instance? Which pragma(s) do we need and
 -- why? Can we even solve this?
 
+-- TODO: GHC is not ok with this..
+--instance {-# OVERLAPPING #-} (a ~~ b, b ~~ c) => a ~~ c where
+  --to = to . to
+  --from = from . from
 
 
 
