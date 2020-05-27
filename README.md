@@ -1,5 +1,8 @@
 # GHC exercises 🚀
 
+_For solutions, please see the `Exercises.hs` modules inside [the `answers`
+branch](https://github.com/i-am-tom/haskell-exercises/tree/answers)._
+
 OK, you know your **monoids** from your **monads**. You know how to write a
 terminal application or two. What's next? What are these language extensions
 that keep being mentioned? How "type-safe" can you _really_ be?
