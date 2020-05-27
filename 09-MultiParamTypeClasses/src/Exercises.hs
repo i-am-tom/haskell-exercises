@@ -37,20 +37,47 @@ newtype YourInt = YourInt Int
 
 -- | a. Write the class!
 
--- class Newtype ... ... where
---   wrap   :: ...
---   unwrap :: ...
+class Newtype (new :: Type) (old :: Type) where
+  wrap   :: old -> new
+  unwrap :: new -> old
 
 -- | b. Write instances for 'MyInt' and 'YourInt'.
 
+instance Newtype MyInt Int where
+  wrap = MyInt
+  unwrap (MyInt x) = x
+
+instance Newtype YourInt Int where
+  wrap = YourInt
+  unwrap (YourInt x) = x
+
 -- | c. Write a function that adds together two values of the same type,
 -- providing that the type is a newtype around some type with a 'Num' instance.
+
+-- This function lets us tell GHC what the type of a value is by specifying it
+-- in a proxy. We'll see in the next chapter that we really don't need to do
+-- this, and there are plenty of ways to avoid it.
+the :: Proxy x -> x -> x
+the _ x = x
+
+-- With the above, we can write the following function. Note that we use the
+-- proxy to let GHC know what @old@ is: if we didn't do this, it would complain
+-- that it can't figure out which @Newtype@ to use!
+add :: (Newtype new old, Num old) => Proxy old -> new -> new -> new
+add _type x y = wrap (the _type (unwrap x + unwrap y))
 
 -- | d. We actually don't need @MultiParamTypeClasses@ for this if we use
 -- @TypeFamilies@. Look at the section on associated type instances here:
 -- https://wiki.haskell.org/GHC/Type_families#Associated_type_instances_2 -
 -- rewrite the class using an associated type, @Old@, to indicate the
 -- "unwrapped" type. What are the signatures of 'wrap' and 'unwrap'?
+
+class Newtype' (new :: Type) where
+  type Old new :: Type
+
+  wrap'   :: Old new -> new
+  unwrap' :: new -> Old new
+
 
 
 
@@ -84,14 +111,39 @@ instance Traversable Identity where
 -- | a. Write that little dazzler! What error do we get from GHC? What
 -- extension does it suggest to fix this?
 
--- class Wanderable … … where
---   wander :: … => (a -> f b) -> t a -> f (t b)
+class Wanderable (c :: (Type -> Type) -> Constraint) (t :: Type -> Type) where
+  wander :: c f => (a -> f b) -> t a -> f (t b)
 
 -- | b. Write a 'Wanderable' instance for 'Identity'.
+
+instance Wanderable Functor Identity where
+  wander f (Identity x) = fmap Identity (f x)
 
 -- | c. Write 'Wanderable' instances for 'Maybe', '[]', and 'Proxy', noting the
 -- differing constraints required on the @f@ type. '[]' might not work so well,
 -- and we'll look at /why/ in the next part of this question!
+
+instance Wanderable Applicative Maybe where
+  wander f (Just x) = fmap Just (f x)
+  wander _ Nothing = pure Nothing
+
+-- @Could not deduce c0 f@ - the problem here is that, in the recursive case,
+-- we can't figure out which @Wanderable@ instance we want for the tail. To
+-- /us/, this seems strange - we just want the list version! However, we
+-- haven't yet told GHC that there's only ever going to be one @Wanderable@
+-- instance for @[]@, so it will complain.
+--
+-- instance Wanderable Applicative [] where
+--   wander f (x : xs) = (:) <$> f x <*> wander f xs
+--   wander f [] = pure []
+
+-- You actually can get around this, though, by making the instance more
+-- general. Here, we say this instance is for @[]@ and "all possible @c@
+-- values". GHC will see this, and select the instance. At /that/ point, it
+-- will try to solve the constraints, which here are just @c ~ Applicative@.
+instance c ~ Applicative => Wanderable c [] where
+  wander f (x : xs) = (:) <$> f x <*> wander f xs
+  wander _ [] = pure []
 
 -- | d. Assuming you turned on the extension suggested by GHC, why does the
 -- following produce an error? Using only the extensions we've seen so far, how
@@ -100,7 +152,20 @@ instance Traversable Identity where
 -- we'll see in later chapters that there are neater solutions to this
 -- problem!)
 
--- test = wander Just [1, 2, 3]
+-- Using the constraint trick means this actually will now compile, even
+-- without the associated type.
+check = wander Just [1, 2, 3]
+
+-- If, for some reason, you can't do the above, the associated type solution
+-- looks like this:
+class Wanderable' (t :: Type -> Type) where
+  type Constrains t :: (Type -> Type) -> Constraint
+
+  -- I've used an infix constraint constructor here using the @TypeOperators@
+  -- extension, but this is a personal style preference rather than anything
+  -- clever.
+  wander' :: t `Constrains` f => (a -> f b) -> t a -> f (t b)
+
 
 
 
@@ -127,14 +192,33 @@ data Fin (limit :: Nat) where
 
 class (x :: Nat) < (y :: Nat) where
   convert :: SNat x -> Fin y
+  coconvert :: Fin y -> Maybe (SNat x)
 
 -- | a. Write the instance that says @Z@ is smaller than @S n@ for /any/ @n@.
+
+instance 'Z < 'S n where
+  convert SZ = FZ
+
+  coconvert FZ = Just SZ
+  coconvert (FS _) = Nothing
 
 -- | b. Write an instance that says, if @x@ is smaller than @y@, then @S x@ is
 -- smaller than @S y@.
 
+instance x < y => 'S x < 'S y where
+  convert (SS n) = FS (convert n)
+
+  coconvert FZ = Nothing
+  coconvert (FS n) = fmap SS (coconvert n)
+
 -- | c. Write the inverse function for the class definition and its two
 -- instances.
+
+-- This one's awkward because @Fin@ "forgets" the exact number, which means
+-- that the translation back must be partial. If we try to convert @Fin 8@ to
+-- @SNat 6@ (I'm using numeric literals for readability here), we should fail
+-- to do so.
+
 
 
 
@@ -148,7 +232,15 @@ class (x :: Nat) < (y :: Nat) where
 
 -- | a. Write that typeclass!
 
+class TypeEquals (x :: Type) (y :: Type) where
+  to :: x -> y
+  from :: y -> x
+
 -- | b. Write that instance!
+
+instance x ~ y => TypeEquals x y where
+  from x = x
+  to x = x
 
 -- | c. When GHC sees @x ~ y@, it can apply anything it knows about @x@ to @y@,
 -- and vice versa. We don't have the same luxury with /our/ class, however –
@@ -160,6 +252,13 @@ class (x :: Nat) < (y :: Nat) where
 -- | d. GHC can see @x ~ y@ and @y ~ z@, then deduce that @x ~ z@. Can we do
 -- the same? Perhaps with a second instance? Which pragma(s) do we need and
 -- why? Can we even solve this?
+--
+-- There are a few ways to get /something/ to compile, but never what you want.
+-- Ultimately, the problem comes with telling GHC which of the two instances to
+-- pick: if you make the transitive case the "default" case, you'll loop
+-- forever. If you make the original case the default case, you'll always fail
+-- the equality check.
+
 
 
 
