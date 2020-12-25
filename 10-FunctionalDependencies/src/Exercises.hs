@@ -250,7 +250,7 @@ instance GNameOf (G.D1 ('G.MetaData name a b c) d) name
 
 {- TEN -}
 
--- In the standard library, we have a series of @liftA*@ functions, such as
+-- | In the standard library, we have a series of @liftA*@ functions, such as
 -- 'liftA2', 'liftA3', 'liftA4'... wouldn't it be nice if we just had /one/
 -- function called 'lift' that generalised all these?
 --
@@ -264,14 +264,14 @@ instance GNameOf (G.D1 ('G.MetaData name a b c) d) name
 -- liftA3 :: Applicative f => (a -> b -> c -> d) -> f a -> f b -> f c -> f d
 -- liftA3 = lift
 
--- Write this function, essentially generalising the f <$> a <*> b <*> c...
+-- | Write this function, essentially generalising the f <$> a <*> b <*> c...
 -- pattern. It may help to see it as pure f <*> a <*> b <*> c..., and start
 -- with a function like this:
 
 -- lift :: (Applicative f, Lift f i o) => i -> o
 -- lift = lift' . pure
 
--- @class Lift f i o ... where lift' :: ...@ is your job! If you get this
+-- | @class Lift f i o ... where lift' :: ...@ is your job! If you get this
 -- right, perhaps with some careful use of @INCOHERENT@, equality constraints,
 -- and functional dependencies, you should be able to get some pretty amazing
 -- type inference:
