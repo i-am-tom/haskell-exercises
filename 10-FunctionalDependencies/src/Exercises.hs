@@ -213,7 +213,7 @@ instance {-# OVERLAPPING #-} Inject x xs
 -- providing an index and a (possibly-type-changing) function. For example:
 --
 -- @
---   update SZ length (HCons True (HCons "Hello" HNil))
+--   update (SS SZ) length (HCons True (HCons "Hello" HNil))
 --     === HCons True (HCons 5 HNil)
 -- @
 
