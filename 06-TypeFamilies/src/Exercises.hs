@@ -310,15 +310,21 @@ type family Drop (n :: Nat) (xs :: [Nat]) :: [Nat] where
 
 type family Sieve' (xs :: [Nat]) :: [Nat] where
   Sieve' '[     ]  = '[]
-  Sieve' (x ': xs) = x ': Sieve' (DropEvery x xs)
+  Sieve' (x ': xs) = x ': Sieve' (DropMod x xs)
 
-type family DropEvery (n :: Nat) (xs :: [Nat]) :: [Nat] where
-  DropEvery n xs = DropEvery' n n xs
+type family DropMod (n :: Nat) (xs :: [Nat]) :: [Nat] where
+  DropMod _ '[] = '[]
+  DropMod n (x ': xs) = DropMod' (IsMod n n x) n x xs
 
-type family DropEvery' (c :: Nat) (n :: Nat) (xs :: [Nat]) :: [Nat] where
-  DropEvery n ('S 'Z) (x ': xs) = DropEvery' n n xs
-  DropEvery n   _     '[     ]  = '[]
-  DropEvery n ('S c)  (x ': xs) = x ': DropEvery' n c xs
+type family IsMod (x :: Nat) (y :: Nat) (z :: Nat) :: Bool where
+  IsMod x 'Z 'Z = 'True
+  IsMod x ('S y) 'Z = 'False
+  IsMod x 'Z ('S z) = IsMod x x ('S z)
+  IsMod x ('S y) ('S z) = IsMod x y z
+
+type family DropMod' (b :: Bool) (n :: Nat) (x :: Nat) (xs :: [Nat]) :: [Nat] where
+  DropMod' 'True n _ xs = DropMod n xs
+  DropMod' 'False n x xs = x ': DropMod n xs
 
 type N0  = 'Z
 type N1  = 'S N0
