@@ -310,15 +310,21 @@ type family Drop (n :: Nat) (xs :: [Nat]) :: [Nat] where
 
 type family Sieve' (xs :: [Nat]) :: [Nat] where
   Sieve' '[     ]  = '[]
-  Sieve' (x ': xs) = x ': Sieve' (DropEvery x xs)
+  Sieve' (x ': xs) = x ': Sieve' (DropMod x xs)
 
-type family DropEvery (n :: Nat) (xs :: [Nat]) :: [Nat] where
-  DropEvery n xs = DropEvery' n n xs
+type family DropMod (n :: Nat) (xs :: [Nat]) :: [Nat] where
+  DropMod _ '[] = '[]
+  DropMod n (x ': xs) = DropMod' (IsMod n n x) n x xs
 
-type family DropEvery' (c :: Nat) (n :: Nat) (xs :: [Nat]) :: [Nat] where
-  DropEvery n ('S 'Z) (x ': xs) = DropEvery' n n xs
-  DropEvery n   _     '[     ]  = '[]
-  DropEvery n ('S c)  (x ': xs) = x ': DropEvery' n c xs
+type family IsMod (x :: Nat) (y :: Nat) (z :: Nat) :: Bool where
+  IsMod x 'Z 'Z = 'True
+  IsMod x ('S y) 'Z = 'False
+  IsMod x 'Z ('S z) = IsMod x x ('S z)
+  IsMod x ('S y) ('S z) = IsMod x y z
+
+type family DropMod' (b :: Bool) (n :: Nat) (x :: Nat) (xs :: [Nat]) :: [Nat] where
+  DropMod' 'True n _ xs = DropMod n xs
+  DropMod' 'False n x xs = x ': DropMod n xs
 
 type N0  = 'Z
 type N1  = 'S N0
@@ -331,12 +337,25 @@ type N7  = 'S N6
 type N8  = 'S N7
 type N9  = 'S N8
 type N10 = 'S N9
-
+type N11 = 'S N10
+type N13 = N11 + N2
+type N17 = N13 + N4
+type N19 = N17 + N2
+type N20 = N19 + N1
+type N23 = N20 + N3
+type N29 = N23 + N6
+type N30 = N29 + N1
+type N31 = N29 + N2
+type N37 = N31 + N6
+type N41 = N37 + N4
+type N43 = N41 + N2
+type N47 = N43 + N4
+type N50 = N47 + N3
 -- Little test...
 data (x :: [Nat]) :~~: (y :: [Nat]) where
   NRefl :: x :~~: x
 
-test :: Sieve N10 :~~: '[ N2, N3, N5, N7 ]
+test :: Sieve N50 :~~: '[N2, N3, N5, N7, N11, N13, N17, N19, N23, N29, N31, N37, N41, N43, N47]
 test = NRefl
 
 
