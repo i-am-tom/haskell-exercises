@@ -342,7 +342,7 @@ type N10 = 'S N9
 data (x :: [Nat]) :~~: (y :: [Nat]) where
   NRefl :: x :~~: x
 
-test :: Sieve N10 :~~: '[N2, N3, N5, N7]
+test :: Sieve N10 :~~: '[ N2, N3, N5, N7 ]
 test = NRefl
 
 
