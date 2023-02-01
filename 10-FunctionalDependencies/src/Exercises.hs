@@ -240,7 +240,7 @@ class Inject (x :: Type) (xs :: [Type]) where
 instance Inject x (x ': xs) where
   inject = Here
 
-instance {-# OVERLAPPING #-} Inject x xs
+instance {-# INCOHERENT #-} Inject x xs
     => Inject x (y ': xs) where
   inject = There . inject
 
@@ -257,13 +257,13 @@ instance {-# OVERLAPPING #-} Inject x xs
 class Project (x :: Type) (xs :: [Type]) (os :: [Type]) where
   project :: Proxy x -> Variant xs -> Either x (Variant os)
 
-instance Project x (x ': xs) xs where
+instance xs ~ ys => Project x (x ': xs) ys where -- same dependency solving trick
   project _ (Here  x)  = Left  x
   project _ (There xs) = Right xs
 
 instance {-# INCOHERENT #-} Project x xs os
     => Project x (y ': xs) (y ': os) where
-  project _ (Here  _ ) = error "Impossible!" -- This is annoying :(
+  project _ (Here  x)  = Right (inject x) -- Not So annoying anymore!
   project p (There xs) = fmap There (project p xs)
 
 
