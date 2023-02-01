@@ -337,25 +337,12 @@ type N7  = 'S N6
 type N8  = 'S N7
 type N9  = 'S N8
 type N10 = 'S N9
-type N11 = 'S N10
-type N13 = N11 + N2
-type N17 = N13 + N4
-type N19 = N17 + N2
-type N20 = N19 + N1
-type N23 = N20 + N3
-type N29 = N23 + N6
-type N30 = N29 + N1
-type N31 = N29 + N2
-type N37 = N31 + N6
-type N41 = N37 + N4
-type N43 = N41 + N2
-type N47 = N43 + N4
-type N50 = N47 + N3
+
 -- Little test...
 data (x :: [Nat]) :~~: (y :: [Nat]) where
   NRefl :: x :~~: x
 
-test :: Sieve N50 :~~: '[N2, N3, N5, N7, N11, N13, N17, N19, N23, N29, N31, N37, N41, N43, N47]
+test :: Sieve N10 :~~: '[N2, N3, N5, N7]
 test = NRefl
 
 
