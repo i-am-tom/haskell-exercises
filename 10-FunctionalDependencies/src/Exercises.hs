@@ -257,13 +257,13 @@ instance {-# INCOHERENT #-} Inject x xs
 class Project (x :: Type) (xs :: [Type]) (os :: [Type]) where
   project :: Proxy x -> Variant xs -> Either x (Variant os)
 
-instance xs ~ ys => Project x (x ': xs) ys where -- same dependency solving trick
+instance xs ~ ys => Project x (x ': xs) ys where
   project _ (Here  x)  = Left  x
   project _ (There xs) = Right xs
 
 instance {-# INCOHERENT #-} Project x xs os
     => Project x (y ': xs) (y ': os) where
-  project _ (Here  x)  = Right (inject x) -- Not So annoying anymore!
+  project _ (Here  x)  = Right (inject x)
   project p (There xs) = fmap There (project p xs)
 
 
