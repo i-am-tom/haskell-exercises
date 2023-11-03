@@ -23,12 +23,12 @@ instance MyClass (Pair a)
 
 Invalid (w/o Flexible Instances):
 ``` haskell
-instance MyClass (a, a) -- not unique
+instance MyClass (a, a) -- abstract variables not unique
 instance MyClass (Either a (Maybe b)) -- use of inner concrete type Maybe
 instance MyClass (a, (b, c)) -- use of inner concrete type (,)
 instance MyClass (a -> b -> c) -- use of inner concrete type (->)
 
-type MyClass String -- type synonym
+type MyClass String -- type synonym (it's [Char])
 
 type Pair' a = (a, a)
 instance MyClass (Pair' a) -- type synonym
